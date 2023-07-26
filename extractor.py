@@ -128,5 +128,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.data_root, args.video_bs, args.batch_size,args.clip_len,args.clip_stride,(256,340),
-                       keep_ori_ratio=True,fps=args.fps,modal=args.modal,out_dir=args.out_dir,
+                       keep_ori_ratio=False,fps=args.fps,modal=args.modal,out_dir=args.out_dir,
                        model_path=args.model_path, log_dir=args.log_dir,local_rank=args.local_rank)

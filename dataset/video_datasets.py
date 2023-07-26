@@ -8,7 +8,7 @@ class VideoDataset(Dataset):
         super().__init__()
         self.data_root = data_root
         self.feature_dir = feature_dir
-        self.data = self.set_data(self.data_root)
+        self.data = self.set_data()
     
     def set_data(self):
         vpath_list= os.listdir(self.data_root)

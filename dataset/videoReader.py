@@ -55,7 +55,9 @@ class VideoLoader:
         #     clip[:len(clip_index)]=orin_clip
         if transforms is not None:
             clip=self.transforms(clip)
-        return clip.astype(np.float32)
+            clip = clip.astype(np.float32)
+            clip = (data * 2 / 255) - 1
+        return clip
             
 
 
