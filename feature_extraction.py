@@ -39,7 +39,7 @@ def feature_extraction(data_root, batch_size, clip_len:int, clip_stride:int,
     else:
         i3d = InceptionI3d(400, in_channels=3)
     i3d.load_state_dict(torch.load(model_path))
-    # i3d.cuda()
+    i3d.cuda()
     i3d.train(False)
     logger.info('model loaded to GPU')
 
@@ -59,8 +59,8 @@ def feature_extraction(data_root, batch_size, clip_len:int, clip_stride:int,
     # feature extraction for each batch
         for batch_index in batch_indexes:
             if len(batch_index)>0:
-                batch_data= get_batch_data(video_loader,batch_index,clip_len)
-                batch_data=torch.from_numpy(batch_data)#.cuda()
+                batch_data= get_batch_data(video_loader,batch_index)
+                batch_data=torch.from_numpy(batch_data).cuda()
                 batch_data = batch_data.permute(0,4,1,2,3)
                 batch_feature = i3d.extract_features(batch_data).data.cpu().numpy()[:,:,0,0,0]
                 video_feature.append(batch_feature)
