@@ -30,10 +30,11 @@ class VideoLoader:
     def get_clip_indexes(self, len, stride):
         n_frame = math.floor(self.n_frame*(self.fps/self.orin_fps))
         indexes=np.linspace(0, self.n_frame-1, n_frame,endpoint=True,dtype=np.int32)
-        start_indexes = indexes[::stride]
+        indices = np.arange(indexes.shape[0])
+        start_indexes = indices[::stride]
         batch_clip_index=[]
         for start in start_indexes:
-            if (start+len)<=n_frame:
+            if (start+len)<=indexes.shape[0]:
                 frame_indexes=indexes[start:(start+len)]
                 # patched_clip=vr.get_batch(frame_indexes)
                 batch_clip_index.append(frame_indexes)
@@ -56,7 +57,7 @@ class VideoLoader:
         if transforms is not None:
             clip=self.transforms(clip)
             clip = clip.astype(np.float32)
-            clip = (data * 2 / 255) - 1
+            clip = (clip * 2 / 255) - 1
         return clip
             
 

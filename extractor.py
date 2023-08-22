@@ -13,9 +13,6 @@ from dataset.transforms.video import Resize
 from dataset.videoReader import VideoLoader
 from tqdm import tqdm
 from torch.distributed import init_process_group
-import eventlet
-
-eventlet.monkey_patch()
 
 init_process_group("nccl")
 
@@ -30,9 +27,9 @@ init_process_group("nccl")
 #         feature = self.i3d.extract_features(data)
 #         return feature[:,:,0,0,0]
 
-def extraction(logger, vid,video_path,fps,keep_ori_ratio, clip_len, clip_stride,
+def extraction(logger, vid,video_path,img_size,fps,keep_ori_ratio, clip_len, clip_stride,
                bs,device,model):
-    vr=VideoLoader(video_path,fps,False, None,None,transforms=Resize((224,224)), keep_ori_ratio=keep_ori_ratio)
+    vr=VideoLoader(video_path,fps,False, img_size[1],img_size[0],transforms=Resize((224,224)), keep_ori_ratio=keep_ori_ratio)
     logger.info(f'{vid} processing')
     clip_indexes = vr.get_clip_indexes(clip_len, clip_stride)
     batch_indexes = split_batch(clip_indexes,bs)
@@ -82,16 +79,8 @@ def main(data_root, video_bs, bs, clip_len:int, clip_stride:int,
         if (vid[0]+'.npz') in existing_features:
             logger.info(f'{vid[0]} exists')
             continue
-        try:
-            with eventlet.Timeout(3000,True):
-                video_feature=extraction(logger, vid[0],video_path[0],fps,keep_ori_ratio, clip_len, clip_stride,
-                    bs,device,model)
-        except Exception:
-            logger.error(f'{vid} process timeout, skip!!!')
-            with open('./skip_vides','a') as f:
-                f.write(vid[0]+'\n')
-                f.close()
-            continue
+        video_feature=extraction(logger, vid[0],video_path[0],img_size, fps,keep_ori_ratio, clip_len, clip_stride,
+            bs,device,model)
     #     vr=VideoLoader(video_path[0],fps,False, None,None,transforms=Resize((224,224)), keep_ori_ratio=keep_ori_ratio)
     #     logger.info(f'{vid} processing')
     #     clip_indexes = vr.get_clip_indexes(clip_len, clip_stride)
